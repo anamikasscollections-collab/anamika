@@ -1,0 +1,16 @@
+{
+  "name": "anamika-collections-workspace",
+  "version": "1.0.0",
+  "description": "ANAMIKA COLLECTIONS - Luxury Saree and Kurti E-Commerce Platform",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "test": "cd backend && npm test"
+  },
+  "author": "Anamika Collections Engineering",
+  "license": "ISC"
+}
+
