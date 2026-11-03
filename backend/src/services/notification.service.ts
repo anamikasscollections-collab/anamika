@@ -204,7 +204,8 @@ class NotificationService {
 
     await this.sendEmail({
       to: email,
-      subject: `${otp} is your ANAMIKA COLLECTIONS Verification Code`,
+      subject: `Your ANAMIKA COLLECTIONS Verification Code is ${otp}`,
+      text: `Namaste ${name},\n\nYour 6-digit email verification code for ANAMIKA COLLECTIONS is: ${otp}\n\nThis code is valid for 10 minutes.\n\nElegance in Every Thread.\nANAMIKA COLLECTIONS\nanamikasscollections@gmail.com`,
       html: htmlContent,
     });
   }
@@ -221,7 +222,7 @@ class NotificationService {
     logger.info(`Sending live WhatsApp message to ${data.recipientPhone}`);
   }
 
-  private async sendEmail(options: { to: string; subject: string; html: string }) {
+  private async sendEmail(options: { to: string; subject: string; html: string; text?: string }) {
     if (!this.emailTransporter || env.EMAIL_DEV_MODE === 'true') {
       logger.info(`[EMAIL-DEV-SIMULATOR] -> To: ${options.to} | Subject: "${options.subject}"`);
       logger.info(`[EMAIL-DEV-SIMULATOR] (HTML body generated with brand styling)`);
@@ -233,6 +234,7 @@ class NotificationService {
         from: env.SMTP_FROM,
         to: options.to,
         subject: options.subject,
+        text: options.text || options.subject,
         html: options.html,
       });
       logger.info(`Live email successfully sent to ${options.to}`);
