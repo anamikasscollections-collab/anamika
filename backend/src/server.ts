@@ -10,6 +10,9 @@ import { logger } from './utils/logger';
 
 const app = express();
 
+// Trust reverse proxies (Vercel, Cloudflare, AWS) for secure rate-limiting & IP resolution
+app.set('trust proxy', 1);
+
 // Security Headers
 app.use(
   helmet({

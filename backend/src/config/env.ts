@@ -12,12 +12,12 @@ const envSchema = z.object({
   CLIENT_URL: z.string().default('http://localhost:5173'),
   
   // Database
-  DATABASE_URL: z.string().default('postgresql://postgres:postgres@localhost:5432/anamika_collections?schema=public'),
+  DATABASE_URL: z.string().default('postgresql://neondb_owner:npg_gXkKUrfz0T4y@ep-icy-union-bb6u1myr-pooler.c-15.us-east-1.aws.neon.tech/neondb?sslmode=require'),
   
   // JWT Security
-  JWT_SECRET: z.string().default('anamika_jwt_secret_development_key_change_in_production_2026'),
+  JWT_SECRET: z.string().default('anamika_jwt_secret_key_production_2026_luxury_silks'),
   JWT_EXPIRES_IN: z.string().default('7d'),
-  ADMIN_JWT_SECRET: z.string().default('anamika_admin_jwt_secret_development_key_change_in_prod_2026'),
+  ADMIN_JWT_SECRET: z.string().default('anamika_admin_secret_key_production_2026_super_admin'),
   ADMIN_JWT_EXPIRES_IN: z.string().default('24h'),
   
   // Razorpay
@@ -26,7 +26,7 @@ const envSchema = z.object({
   RAZORPAY_WEBHOOK_SECRET: z.string().default('sample_razorpay_webhook_secret'),
   
   // Shiprocket
-  SHIPROCKET_EMAIL: z.string().default('shipping@anamikacollections.com'),
+  SHIPROCKET_EMAIL: z.string().default('anamikasscollections@gmail.com'),
   SHIPROCKET_PASSWORD: z.string().default('sample_shiprocket_password'),
   SHIPROCKET_API_BASE_URL: z.string().default('https://apiv2.shiprocket.in/v1/external'),
   SHIPROCKET_PICKUP_PINCODE: z.string().default('110001'),
@@ -43,12 +43,12 @@ const envSchema = z.object({
   WHATSAPP_DEV_MODE: z.string().default('true'),
   
   // Email Notification Service (SMTP)
-  SMTP_HOST: z.string().default('smtp.mailtrap.io'),
-  SMTP_PORT: z.string().default('2525'),
-  SMTP_USER: z.string().default('sample_smtp_user'),
-  SMTP_PASS: z.string().default('sample_smtp_pass'),
-  SMTP_FROM: z.string().default('"ANAMIKA COLLECTIONS" <orders@anamikacollections.com>'),
-  EMAIL_DEV_MODE: z.string().default('true'),
+  SMTP_HOST: z.string().default('smtp.gmail.com'),
+  SMTP_PORT: z.string().default('465'),
+  SMTP_USER: z.string().default('anamikasscollections@gmail.com'),
+  SMTP_PASS: z.string().default('buokkcankdnwqmde'),
+  SMTP_FROM: z.string().default('"ANAMIKA COLLECTIONS" <anamikasscollections@gmail.com>'),
+  EMAIL_DEV_MODE: z.string().default('false'),
 });
 
 const parsed = envSchema.safeParse(process.env);

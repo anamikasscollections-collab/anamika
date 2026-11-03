@@ -223,7 +223,24 @@ class NotificationService {
   }
 
   private async sendEmail(options: { to: string; subject: string; html: string; text?: string }) {
-    if (!this.emailTransporter || env.EMAIL_DEV_MODE === 'true') {
+    if (!this.emailTransporter) {
+      try {
+        this.emailTransporter = nodemailer.createTransport({
+          host: env.SMTP_HOST || 'smtp.gmail.com',
+          port: parseInt(env.SMTP_PORT, 10) || 465,
+          secure: true,
+          auth: {
+            user: env.SMTP_USER || 'anamikasscollections@gmail.com',
+            pass: env.SMTP_PASS || 'buokkcankdnwqmde',
+          },
+        });
+        logger.info('Nodemailer SMTP transporter initialized on the fly');
+      } catch (err) {
+        logger.error('Failed to initialize email transporter on the fly', err);
+      }
+    }
+
+    if (!this.emailTransporter || (env.EMAIL_DEV_MODE === 'true' && env.NODE_ENV === 'test')) {
       logger.info(`[EMAIL-DEV-SIMULATOR] -> To: ${options.to} | Subject: "${options.subject}"`);
       logger.info(`[EMAIL-DEV-SIMULATOR] (HTML body generated with brand styling)`);
       return;
@@ -231,7 +248,7 @@ class NotificationService {
 
     try {
       await this.emailTransporter.sendMail({
-        from: env.SMTP_FROM,
+        from: env.SMTP_FROM || '"ANAMIKA COLLECTIONS" <anamikasscollections@gmail.com>',
         to: options.to,
         subject: options.subject,
         text: options.text || options.subject,

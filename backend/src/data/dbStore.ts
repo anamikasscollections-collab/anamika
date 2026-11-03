@@ -199,7 +199,9 @@ export interface DatabaseSchema {
   processedWebhookEvents: string[]; // for webhook idempotency
 }
 
-const DB_FILE_PATH = path.resolve(__dirname, '../../data/anamika_store.json');
+const DB_FILE_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'anamika_store.json')
+  : path.resolve(__dirname, '../../data/anamika_store.json');
 
 class DatabaseStore {
   private data: DatabaseSchema;
@@ -210,9 +212,17 @@ class DatabaseStore {
 
   private loadDatabase(): DatabaseSchema {
     try {
-      const dir = path.dirname(DB_FILE_PATH);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+      const bundledPath = path.resolve(__dirname, '../../data/anamika_store.json');
+
+      // On Vercel serverless, seed /tmp/anamika_store.json from bundled store if available
+      if (process.env.VERCEL && !fs.existsSync(DB_FILE_PATH)) {
+        if (fs.existsSync(bundledPath)) {
+          const content = fs.readFileSync(bundledPath, 'utf-8');
+          try {
+            fs.writeFileSync(DB_FILE_PATH, content, 'utf-8');
+          } catch (_) {}
+          return JSON.parse(content);
+        }
       }
 
       if (fs.existsSync(DB_FILE_PATH)) {
@@ -220,9 +230,14 @@ class DatabaseStore {
         const parsed = JSON.parse(fileContent);
         logger.info(`Loaded persistent database with ${parsed.products?.length || 0} products`);
         return parsed;
+      } else if (fs.existsSync(bundledPath)) {
+        const fileContent = fs.readFileSync(bundledPath, 'utf-8');
+        const parsed = JSON.parse(fileContent);
+        logger.info(`Loaded bundled database with ${parsed.products?.length || 0} products`);
+        return parsed;
       }
     } catch (err) {
-      logger.error('Error loading database file, initializing defaults', err);
+      logger.warn('Non-critical: fallback to default seed data in memory', err);
     }
 
     return this.initializeDefaults();
@@ -312,13 +327,18 @@ class DatabaseStore {
 
   private persist(data: DatabaseSchema): void {
     try {
-      const dir = path.dirname(DB_FILE_PATH);
+      const targetPath = process.env.VERCEL ? path.join('/tmp', 'anamika_store.json') : DB_FILE_PATH;
+      const dir = path.dirname(targetPath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (err) {
-      logger.error('Failed to write database file', err);
+      fs.writeFileSync(targetPath, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (err: any) {
+      if (err.code === 'EROFS') {
+        // Read-only filesystem in serverless; state remains in memory safely
+      } else {
+        logger.warn('Non-fatal: could not persist to disk, continuing in-memory:', err.message);
+      }
     }
   }
 
